@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "Lumina AI — Gemini Cookie Helper",
+  "version": "1.0.0",
+  "description": "Helps you connect your Gemini account to Lumina AI",
+  "permissions": ["cookies", "activeTab", "clipboardWrite", "tabs"],
+  "host_permissions": [
+    "https://gemini.google.com/*",
+    "http://localhost:5173/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "index.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://localhost:5173/*"],
+      "js": ["content.js"]
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:;"
+  }
+}
