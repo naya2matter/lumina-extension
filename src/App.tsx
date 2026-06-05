@@ -129,84 +129,92 @@ function App() {
   }, [])
 
   return (
-    <div className="popup">
-      <header className="popup-header">
-        <h1 className="popup-title">Lumina AI</h1>
-        <p className="popup-subtitle">Gemini Cookie Helper</p>
-      </header>
-
-      <div className="popup-body">
-        <div
-          className={`badge ${
-            tabStatus === 'ready'
-              ? 'badge--success'
-              : tabStatus === 'checking'
-                ? 'badge--muted'
-                : 'badge--warning'
-          }`}
-        >
-          {tabStatus === 'checking' && 'Checking\u2026'}
-          {tabStatus === 'ready' && '\u2713 Gemini tab detected'}
-          {tabStatus === 'no-gemini' && '\u26a0 Open Gemini first'}
-        </div>
-
-        <p className="popup-description">
-          Click below to read your Gemini session cookies and send them to Lumina AI.
-        </p>
-
-        <div className="popup-actions">
-          <Button
-            onClick={handleCapture}
-            disabled={tabStatus !== 'ready' || loading !== null}
-            className="w-full"
-          >
-            {loading === 'capture' ? (
-              <>
-                <Loader2 className="animate-spin" />
-                Capturing\u2026
-              </>
-            ) : (
-              <>
-                <Zap />
-                Capture &amp; Send to Lumina AI
-              </>
-            )}
-          </Button>
-
-          <Button
-            variant="outline"
-            onClick={handleCopy}
-            disabled={loading !== null}
-            className="w-full"
-          >
-            {loading === 'copy' ? (
-              <>
-                <Loader2 className="animate-spin" />
-                Copying\u2026
-              </>
-            ) : (
-              <>
-                <Copy />
-                Copy to Clipboard
-              </>
-            )}
-          </Button>
-        </div>
-
-        {result !== null && (
-          <div className={`result result--${result.type}`}>
-            {result.type === 'success' ? (
-              <CheckCircle size={15} />
-            ) : (
-              <AlertTriangle size={15} />
-            )}
-            <span>{result.msg}</span>
+    <div className="page-shell">
+      <div className="popup">
+        <header className="popup-header">
+          <div className="brand-row">
+            <div className="brand-mark">L</div>
+            <div>
+              <h1 className="popup-title">Lumina AI</h1>
+              <p className="popup-subtitle">Gemini Cookie Helper</p>
+            </div>
           </div>
-        )}
+          <p className="popup-hint">Securely read Gemini cookies and deliver them to your Lumina session.</p>
+        </header>
+
+        <div className="popup-body">
+          <div className="status-panel">
+            <div
+              className={`badge ${
+                tabStatus === 'ready'
+                  ? 'badge--success'
+                  : tabStatus === 'checking'
+                    ? 'badge--muted'
+                    : 'badge--warning'
+              }`}
+            >
+              {tabStatus === 'checking' && 'Checking\u2026'}
+              {tabStatus === 'ready' && '\u2713 Gemini tab detected'}
+              {tabStatus === 'no-gemini' && '\u26a0 Open Gemini first'}
+            </div>
+            <p className="status-copy">
+              Open Gemini in the current window and click the button below to capture cookies.
+            </p>
+          </div>
+
+          <div className="action-grid">
+            <Button
+              onClick={handleCapture}
+              disabled={tabStatus !== 'ready' || loading !== null}
+              className="button-full"
+            >
+              {loading === 'capture' ? (
+                <>
+                  <Loader2 className="icon-spin" />
+                  Capturing\u2026
+                </>
+              ) : (
+                <>
+                  <Zap />
+                  Capture &amp; Send
+                </>
+              )}
+            </Button>
+
+            <Button
+              variant="outline"
+              onClick={handleCopy}
+              disabled={loading !== null}
+              className="button-full"
+            >
+              {loading === 'copy' ? (
+                <>
+                  <Loader2 className="icon-spin" />
+                  Copying\u2026
+                </>
+              ) : (
+                <>
+                  <Copy />
+                  Copy to Clipboard
+                </>
+              )}
+            </Button>
+          </div>
+
+          {result !== null && (
+            <div className={`result result--${result.type}`}>
+              {result.type === 'success' ? (
+                <CheckCircle size={16} />
+              ) : (
+                <AlertTriangle size={16} />
+              )}
+              <span>{result.msg}</span>
+            </div>
+          )}
+        </div>
 
         <footer className="popup-footer">
-          Your cookies are sent only to your Lumina AI instance. They are never stored
-          by this extension.
+          Your cookies are sent only to your Lumina AI instance. They are never stored by this extension.
         </footer>
       </div>
     </div>
