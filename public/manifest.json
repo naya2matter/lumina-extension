@@ -6,7 +6,9 @@
   "permissions": ["cookies", "activeTab", "clipboardWrite", "tabs"],
   "host_permissions": [
     "https://gemini.google.com/*",
-    "http://localhost:5173/*"
+    "http://localhost:5173/*",
+    "http://localhost:3000/*",
+    "http://127.0.0.1:3000/*"
   ],
   "background": {
     "service_worker": "background.js"
@@ -16,7 +18,11 @@
   },
   "content_scripts": [
     {
-      "matches": ["http://localhost:5173/*"],
+      "matches": [
+        "http://localhost:5173/*",
+        "http://localhost:3000/*",
+        "http://127.0.0.1:3000/*"
+      ],
       "js": ["content.js"]
     }
   ],
