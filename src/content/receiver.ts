@@ -1,9 +1,15 @@
 // content/receiver.ts
-// Injected into the Lumina AI tab (the chat app).
-// Two jobs:
-//  1. Hand the popup the user's JWT (read from the page's localStorage) so the
+// Injected into the Lumina AI tab AND the embedded widget iframe (all_frames).
+// Three jobs:
+//  1. Mark that the extension is installed so the page/widget can detect it.
+//  2. Hand the popup the user's JWT (read from the page's localStorage) so the
 //     extension can call the backend directly.
-//  2. Legacy bridge: forward LUMINA_COOKIES to a CustomEvent for the React app.
+//  3. Drive the "Connect Gemini" button: relay lumina:connect-gemini to the
+//     background service worker over a port, and relay its progress messages
+//     back as lumina:gemini-status CustomEvents. Also keep the legacy
+//     LUMINA_COOKIES bridge for the old copy-paste flow.
+
+document.documentElement.dataset.luminaExt = '1'
 
 chrome.runtime.onMessage.addListener(
   (
@@ -25,3 +31,12 @@ chrome.runtime.onMessage.addListener(
     }
   },
 )
+
+window.addEventListener('lumina:connect-gemini', (e) => {
+  const token = (e as CustomEvent<{ token?: string }>).detail?.token
+  const port = chrome.runtime.connect({ name: 'connect-gemini' })
+  port.onMessage.addListener((msg) => {
+    window.dispatchEvent(new CustomEvent('lumina:gemini-status', { detail: msg }))
+  })
+  port.postMessage({ type: 'CONNECT_GEMINI', token })
+})
