@@ -2,7 +2,7 @@
 // Orchestrates the one-click Gemini connect flow and reads session cookies.
 // Cookies are never stored or logged — they are forwarded directly in memory.
 
-const BACKEND_URL = 'http://127.0.0.1:8000'; // change to your production API URL when deploying
+const BACKEND_URL = 'https://backend.ai.lcportal.cloud'; // production Lumina bridge API
 const GEMINI_URL = 'https://gemini.google.com/app';
 const POLL_INTERVAL_MS = 1000;
 const POLL_TIMEOUT_MS = 120000; // 2 minutes to allow a manual Google sign-in

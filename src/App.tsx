@@ -36,7 +36,7 @@ const isChromeExtension =
   typeof chrome.runtime !== 'undefined'
 
 // Origins where the Lumina chat app runs (must match manifest content_scripts).
-const CHAT_ORIGINS = ['localhost:5173', 'localhost:3000', '127.0.0.1:3000']
+const CHAT_ORIGINS = ['localhost:5173', 'localhost:3000', '127.0.0.1:3000', 'ai.lcportal.cloud']
 
 const PHASE_LABEL: Record<Exclude<ConnectPhase, 'done' | 'error'>, string> = {
   opening: 'Opening Gemini…',

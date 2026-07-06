@@ -6,6 +6,8 @@
   "permissions": ["cookies", "activeTab", "clipboardWrite", "tabs", "scripting"],
   "host_permissions": [
     "https://gemini.google.com/*",
+    "https://ai.lcportal.cloud/*",
+    "https://backend.ai.lcportal.cloud/*",
     "http://localhost:5173/*",
     "http://localhost:3000/*",
     "http://127.0.0.1:3000/*",
@@ -21,6 +23,7 @@
   "content_scripts": [
     {
       "matches": [
+        "https://ai.lcportal.cloud/*",
         "http://localhost:5173/*",
         "http://localhost:3000/*",
         "http://127.0.0.1:3000/*"
@@ -30,6 +33,6 @@
     }
   ],
   "content_security_policy": {
-    "extension_pages": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' http://127.0.0.1:8000 http://localhost:8000;"
+    "extension_pages": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://backend.ai.lcportal.cloud http://127.0.0.1:8000 http://localhost:8000;"
   }
 }
