@@ -1,8 +1,13 @@
 {
   "manifest_version": 3,
-  "name": "Lumina AI — Gemini Cookie Helper",
+  "name": "PNE LC AI",
   "version": "1.0.0",
-  "description": "Helps you connect your Gemini account to Lumina AI",
+  "description": "Connect your Gemini account to PNE LC AI.",
+  "icons": {
+    "16": "icon-16.png",
+    "48": "icon-48.png",
+    "128": "icon-128.png"
+  },
   "permissions": ["cookies", "activeTab", "clipboardWrite", "tabs", "scripting"],
   "host_permissions": [
     "https://gemini.google.com/*",
@@ -18,7 +23,13 @@
     "service_worker": "background.js"
   },
   "action": {
-    "default_popup": "index.html"
+    "default_popup": "index.html",
+    "default_icon": {
+      "16": "icon-16.png",
+      "32": "icon-32.png",
+      "48": "icon-48.png",
+      "128": "icon-128.png"
+    }
   },
   "content_scripts": [
     {

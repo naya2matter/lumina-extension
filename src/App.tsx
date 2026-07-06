@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
-import { CheckCircle, AlertTriangle, Loader2, Copy, Zap } from 'lucide-react'
+import { CheckCircle, AlertTriangle, Loader2, Copy, Zap, Pizza } from 'lucide-react'
 import './App.css'
 
 interface CookieResponse {
@@ -35,26 +35,31 @@ const isChromeExtension =
   typeof chrome.tabs !== 'undefined' &&
   typeof chrome.runtime !== 'undefined'
 
-// Origins where the Lumina chat app runs (must match manifest content_scripts).
+// Origins where the PNE LC AI chat app runs (must match manifest content_scripts).
 const CHAT_ORIGINS = ['localhost:5173', 'localhost:3000', '127.0.0.1:3000', 'ai.lcportal.cloud']
+
+// Map each chat origin to its corresponding bridge API.
+function backendUrlForOrigin(tabUrl: string): string {
+  if (tabUrl.includes('ai.lcportal.cloud')) return 'https://backend.ai.lcportal.cloud'
+  return 'http://127.0.0.1:8000'
+}
 
 const PHASE_LABEL: Record<Exclude<ConnectPhase, 'done' | 'error'>, string> = {
   opening: 'Opening Gemini…',
   waiting: 'Waiting for Gemini sign-in…',
   capturing: 'Capturing cookies…',
-  sending: 'Sending to Lumina…',
+  sending: 'Sending to PNE LC AI…',
 }
 
-// Read the JWT directly from the active chat tab's localStorage using executeScript.
-// This works even if the content script has not been injected yet (no pre-injection required).
-async function getAuthTokenFromActiveTab(): Promise<string | null> {
+// Read the JWT from the active chat tab's localStorage and derive the backend URL.
+async function getAuthTokenFromActiveTab(): Promise<{ token: string | null; backendUrl: string }> {
   return new Promise((resolve) => {
     chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
       const tab = tabs[0]
       const url = tab?.url ?? ''
       const onChat = CHAT_ORIGINS.some((o) => url.includes(o))
       if (tab?.id == null || !onChat) {
-        resolve(null)
+        resolve({ token: null, backendUrl: 'http://127.0.0.1:8000' })
         return
       }
       try {
@@ -62,9 +67,12 @@ async function getAuthTokenFromActiveTab(): Promise<string | null> {
           target: { tabId: tab.id },
           func: () => localStorage.getItem('auth_token'),
         })
-        resolve((results[0]?.result as string | null) ?? null)
+        resolve({
+          token: (results[0]?.result as string | null) ?? null,
+          backendUrl: backendUrlForOrigin(url),
+        })
       } catch {
-        resolve(null)
+        resolve({ token: null, backendUrl: backendUrlForOrigin(url) })
       }
     })
   })
@@ -73,6 +81,7 @@ async function getAuthTokenFromActiveTab(): Promise<string | null> {
 function App() {
   const [authStatus, setAuthStatus] = useState<AuthStatus>('checking')
   const [token, setToken] = useState<string | null>(null)
+  const [backendUrl, setBackendUrl] = useState('http://127.0.0.1:8000')
   const [phase, setPhase] = useState<ConnectPhase | null>(null)
   const [copyLoading, setCopyLoading] = useState(false)
   const [result, setResult] = useState<ResultState>(null)
@@ -82,8 +91,9 @@ function App() {
       setAuthStatus('no-auth')
       return
     }
-    getAuthTokenFromActiveTab().then((t) => {
+    getAuthTokenFromActiveTab().then(({ token: t, backendUrl: url }) => {
       setToken(t)
+      setBackendUrl(url)
       setAuthStatus(t ? 'ready' : 'no-auth')
     })
   }, [])
@@ -92,7 +102,7 @@ function App() {
 
   const handleConnect = useCallback(() => {
     if (!isChromeExtension || !token) {
-      setResult({ type: 'error', msg: 'Open the Lumina chat and sign in first.' })
+      setResult({ type: 'error', msg: 'Open the PNE LC AI chat and sign in first.' })
       return
     }
 
@@ -118,8 +128,8 @@ function App() {
       setPhase((p) => (p === 'done' || p === 'error' ? p : null))
     })
 
-    port.postMessage({ type: 'CONNECT_GEMINI', token })
-  }, [token])
+    port.postMessage({ type: 'CONNECT_GEMINI', token, backendUrl })
+  }, [token, backendUrl])
 
   const handleCopy = useCallback(() => {
     if (!isChromeExtension) {
@@ -146,7 +156,7 @@ function App() {
           )
           setResult({
             type: 'success',
-            msg: 'Copied! Paste into the Lumina AI connect screen.',
+            msg: 'Copied! Paste into the PNE LC AI connect screen.',
           })
         } catch {
           setResult({ type: 'error', msg: 'Clipboard write failed.' })
@@ -163,14 +173,14 @@ function App() {
       <div className="popup">
         <header className="popup-header">
           <div className="brand-row">
-            <div className="brand-mark">L</div>
+            <div className="brand-mark"><Pizza size={22} /></div>
             <div>
-              <h1 className="popup-title">Lumina AI</h1>
+              <h1 className="popup-title">PNE LC AI</h1>
               <p className="popup-subtitle">Gemini Connector</p>
             </div>
           </div>
           <p className="popup-hint">
-            One click opens Gemini, captures your session, and connects it to Lumina.
+            One click opens Gemini, captures your session, and connects it to PNE LC AI.
           </p>
         </header>
 
@@ -186,15 +196,15 @@ function App() {
               }`}
             >
               {authStatus === 'checking' && 'Checking…'}
-              {authStatus === 'ready' && '✓ Signed in to Lumina'}
-              {authStatus === 'no-auth' && '⚠ Open Lumina & sign in'}
+              {authStatus === 'ready' && '✓ Signed in to PNE LC AI'}
+              {authStatus === 'no-auth' && '⚠ Open PNE LC AI & sign in'}
             </div>
             <p className="status-copy">
               {connecting
                 ? PHASE_LABEL[phase as Exclude<ConnectPhase, 'done' | 'error'>]
                 : authStatus === 'ready'
                   ? 'Click below — a Gemini tab opens, signs you in, and closes automatically.'
-                  : 'Open your Lumina chat tab and sign in, then reopen this popup.'}
+                  : 'Open your PNE LC AI chat tab and sign in, then reopen this popup.'}
             </p>
           </div>
 
@@ -250,7 +260,7 @@ function App() {
         </div>
 
         <footer className="popup-footer">
-          Your cookies are sent only to your Lumina AI instance. They are never stored by this extension.
+          Your cookies are sent only to your PNE LC AI instance. They are never stored by this extension.
         </footer>
       </div>
     </div>

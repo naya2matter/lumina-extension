@@ -2,7 +2,9 @@
 // Orchestrates the one-click Gemini connect flow and reads session cookies.
 // Cookies are never stored or logged — they are forwarded directly in memory.
 
-const BACKEND_URL = 'https://backend.ai.lcportal.cloud'; // production Lumina bridge API
+// Backend URL is passed per-message from the popup so the same extension works
+// against both local (http://127.0.0.1:8000) and production (https://backend.ai.lcportal.cloud).
+const DEFAULT_BACKEND_URL = 'https://backend.ai.lcportal.cloud';
 const GEMINI_URL = 'https://gemini.google.com/app';
 const POLL_INTERVAL_MS = 1000;
 const POLL_TIMEOUT_MS = 120000; // 2 minutes to allow a manual Google sign-in
@@ -67,11 +69,12 @@ chrome.runtime.onConnect.addListener((port) => {
 
   port.onMessage.addListener((message) => {
     if (message.type !== 'CONNECT_GEMINI') return;
-    runConnectFlow(message.token, report);
+    const backendUrl = message.backendUrl || DEFAULT_BACKEND_URL;
+    runConnectFlow(message.token, backendUrl, report);
   });
 });
 
-async function runConnectFlow(token, report) {
+async function runConnectFlow(token, backendUrl, report) {
   if (!token) {
     report({ phase: 'error', error: 'Not signed in to Lumina. Open the chat and sign in first.' });
     return;
@@ -124,7 +127,7 @@ async function runConnectFlow(token, report) {
 
     // 4. Send straight to the backend with the user's JWT.
     report({ phase: 'sending' });
-    const res = await fetch(`${BACKEND_URL}/api/cookies`, {
+    const res = await fetch(`${backendUrl}/api/cookies`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
