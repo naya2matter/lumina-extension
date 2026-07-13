@@ -36,10 +36,11 @@
   display: grid;
   place-items: center;
   border-radius: 14px;
-  background: rgba(42, 39, 58, 0.82);
-  color: #a78bfa;
+  background: linear-gradient(135deg, #fb923c, #f97316 55%, #ea580c);
+  color: #ffffff;
   font-weight: 700;
   font-size: 1rem;
+  box-shadow: 0 8px 20px -8px rgba(234, 88, 12, 0.6);
 }
 
 .popup-title {

@@ -1,0 +1,19 @@
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="lcBadge" x1="8" y1="8" x2="120" y2="120" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fb923c"/>
+      <stop offset="0.55" stop-color="#f97316"/>
+      <stop offset="1" stop-color="#ea580c"/>
+    </linearGradient>
+  </defs>
+  <rect x="6" y="6" width="116" height="116" rx="30" fill="url(#lcBadge)"/>
+  <rect x="7" y="7" width="114" height="114" rx="29" fill="none" stroke="#ffffff" stroke-opacity="0.20" stroke-width="2"/>
+  <!-- Pizza slice: crust at top, point at bottom -->
+  <path d="M64 30 L94 80 Q64 94 34 80 Z" fill="#ffffff"/>
+  <!-- Crust band -->
+  <path d="M34 80 Q64 94 94 80" fill="none" stroke="#ffffff" stroke-width="9" stroke-linecap="round"/>
+  <!-- Pepperoni -->
+  <circle cx="64" cy="53" r="5.6" fill="#ea580c"/>
+  <circle cx="50" cy="70" r="5" fill="#ea580c"/>
+  <circle cx="78" cy="70" r="5" fill="#ea580c"/>
+</svg>

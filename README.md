@@ -1,73 +1,59 @@
-# React + TypeScript + Vite
+# Lumina AI — Gemini Connector (Chrome Extension)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A Manifest V3 Chrome extension that connects your Google Gemini session to Lumina AI
+in **one click** — no manual cookie copying.
 
-Currently, two official plugins are available:
+## What it does
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+When you click **Connect Gemini Automatically**, the extension:
 
-## React Compiler
+1. Reads your logged-in Lumina session token from the active chat tab.
+2. Opens a Gemini tab (`gemini.google.com`) and waits for it to load / for you to sign in.
+3. Extracts your Gemini session cookies (`__Secure-1PSID`, `__Secure-1PSIDTS`).
+4. Closes the Gemini tab.
+5. Sends the cookies directly to the Lumina backend (`POST /api/cookies`) with your token.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Cookies are held in memory only and forwarded directly — the extension never stores them.
 
-## Expanding the ESLint configuration
+## Setup
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run build
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Then load it in Chrome:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+1. Open `chrome://extensions`.
+2. Enable **Developer mode** (top-right).
+3. Click **Load unpacked** and select the `dist/` folder.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Usage
+
+1. Install the Lumina Extension in Chrome (see Setup).
+2. Open the Lumina chat app and **sign in**.
+3. With the chat tab active, click the Lumina extension icon in your toolbar.
+4. Click **Connect Gemini Automatically** in the popup.
+5. If you are not already signed into Google, sign in on the Gemini tab that opens —
+   the extension detects it automatically, closes the tab, and finishes the connection.
+
+That's it. You no longer need to open `gemini.google.com` or copy cookies by hand.
+
+> **Manual fallback:** the **Copy Cookies** button still reads the Gemini cookies of the
+> current tab and copies them to your clipboard, in case you want to paste them into the
+> Lumina connect screen yourself.
+
+## Configuration
+
+- **Backend URL** — set in `public/background.js` (`BACKEND_URL`, defaults to
+  `http://127.0.0.1:8000`). Update it and the `host_permissions` in
+  `public/manifest.json` when deploying to production.
+- **Chat origins** — the popup looks for the chat tab on the origins listed in
+  `CHAT_ORIGINS` (`src/App.tsx`) and `content_scripts` (`public/manifest.json`).
+
+## Project structure
+
+- `public/manifest.json` — MV3 manifest (permissions, host permissions, content script).
+- `public/background.js` — service worker; orchestrates the connect flow and reads cookies.
+- `src/App.tsx` — popup UI (single-click connect + progress + manual fallback).
+- `src/content/receiver.ts` — content script; exposes the auth token to the popup.
