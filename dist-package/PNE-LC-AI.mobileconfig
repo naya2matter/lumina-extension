@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>PayloadContent</key>
+  <array>
+    <dict>
+      <key>PayloadType</key>
+      <string>com.google.Chrome</string>
+      <key>PayloadIdentifier</key>
+      <string>cloud.lcportal.ai.chrome.forcelist</string>
+      <key>PayloadUUID</key>
+      <string>8C4A2F31-2D5B-4FA0-8B32-1BC2D3E4F506</string>
+      <key>PayloadVersion</key>
+      <integer>1</integer>
+      <key>PayloadDisplayName</key>
+      <string>PNE LC AI — Gemini Connector (Extension)</string>
+      <key>ExtensionInstallForcelist</key>
+      <array>
+        <string>epcnjdecfbmgbbcpebihlfiklanlijeb;https://ai.lcportal.cloud/ext/update.xml</string>
+      </array>
+    </dict>
+  </array>
+  <key>PayloadDisplayName</key>
+  <string>PNE LC AI — Gemini Connector</string>
+  <key>PayloadDescription</key>
+  <string>Force-installs the PNE LC AI Gemini Connector extension into Google Chrome.</string>
+  <key>PayloadIdentifier</key>
+  <string>cloud.lcportal.ai.chrome</string>
+  <key>PayloadType</key>
+  <string>Configuration</string>
+  <key>PayloadUUID</key>
+  <string>7B3F1E20-1C4A-4E9B-9A21-0AB1C2D3E4F5</string>
+  <key>PayloadVersion</key>
+  <integer>1</integer>
+  <key>PayloadScope</key>
+  <string>User</string>
+</dict>
+</plist>
