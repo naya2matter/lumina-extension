@@ -3,12 +3,13 @@
   "name": "PNE LC AI",
   "version": "1.0.0",
   "description": "Connect your Gemini account to PNE LC AI.",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvSFa77Yp2ZT4RKdN1lX9USbLTVPR2ucCcZE452C54u2eI9X2KKLRsxMb/bYs37/DRDwtvEvm/+bONZVG+dXkNHAAMZs8EusBzr0fh4+LREDqOKltkaG7PI2QRBtXuIWkQ2LBwuJr/ZQInb6zWTH4iAyFfVPOjqcUTDThc7RWeLE+2ppfjLGmlTMBhBJAl7VYUVYzGHeLqvT15Z8rkX8DfohiDrQKucKHd1uOteSuVhMlCQ8rNvagR1EZFaTN0gJSL+PyI33F0i1jD+1e4Y5zNF8WiJaDFOgC/MZ9ga8+EEgxqTprxg3ydxjPDCtrHUg/p/y9kd2NK5txrWKQCNG0eQIDAQAB",
   "icons": {
     "16": "icon-16.png",
     "48": "icon-48.png",
     "128": "icon-128.png"
   },
-  "permissions": ["cookies", "activeTab", "clipboardWrite", "tabs", "scripting"],
+  "permissions": ["cookies", "activeTab", "clipboardWrite", "tabs", "scripting", "nativeMessaging", "alarms"],
   "host_permissions": [
     "https://gemini.google.com/*",
     "https://ai.lcportal.cloud/*",

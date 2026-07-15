@@ -1,0 +1,30 @@
+#!/bin/bash
+# Runs after the payload lands in ~/Library/Application Support/PNE LC AI.
+# Registers the native-messaging host (with the real absolute path) and opens
+# the extension folder so the user can "Load unpacked".
+set -e
+
+APP_DIR="$HOME/Library/Application Support/PNE LC AI"
+EXT_ID="glanidmlbocpbpihkbahamdipkkiiacb"
+NMH_DIR="$HOME/Library/Application Support/Google/Chrome/NativeMessagingHosts"
+
+mkdir -p "$NMH_DIR"
+chmod +x "$APP_DIR/lc-updater" 2>/dev/null || true
+
+cat > "$NMH_DIR/com.pneunited.lc_updater.json" <<EOF
+{
+  "name": "com.pneunited.lc_updater",
+  "description": "PNE LC AI self-hosted updater",
+  "path": "$APP_DIR/lc-updater",
+  "type": "stdio",
+  "allowed_origins": [ "chrome-extension://$EXT_ID/" ]
+}
+EOF
+
+# Best-effort: clear the quarantine flag so the helper runs without prompts.
+xattr -dr com.apple.quarantine "$APP_DIR" 2>/dev/null || true
+
+# Open the extension folder to make the one-time "Load unpacked" easy.
+open "$APP_DIR/extension" 2>/dev/null || true
+
+exit 0

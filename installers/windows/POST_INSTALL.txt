@@ -1,0 +1,27 @@
+PNE LC AI — one more step to finish
+
+The extension files and the auto-updater are now installed. Chrome needs you to
+load the extension once (this is a Chrome requirement for privately-distributed
+extensions — it only has to be done a single time):
+
+  1. Open Chrome and go to:   chrome://extensions
+     (tick "Open Chrome's Extensions page" on the previous screen, or type it in
+     the address bar yourself.)
+
+  2. Turn ON "Developer mode" using the switch in the TOP-RIGHT corner.
+     Leave this switch ON — the extension needs it to stay enabled.
+
+  3. Click "Load unpacked" (top-left).
+
+  4. In the folder picker, choose the "extension" folder that just opened in a
+     window (inside "PNE LC AI"). Select the folder itself and click "Select
+     Folder".
+
+That's it — "PNE LC AI" now appears in your extensions and pin it to the toolbar
+if you like. Updates are applied automatically in the background from our server;
+you do not need to repeat these steps.
+
+Note: after a major Chrome update, Chrome may occasionally disable
+Developer-mode extensions. If "PNE LC AI" ever disappears, just open
+chrome://extensions, make sure "Developer mode" is ON, and toggle the extension
+back on. (No re-install needed.)

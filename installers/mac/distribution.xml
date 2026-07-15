@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<installer-gui-script minSpecVersion="1">
+  <title>PNE LC AI</title>
+  <!-- User-home domain only: installs into the current user's ~/Library with no
+       admin password. -->
+  <domains enable_anywhere="false" enable_currentUserHome="true" enable_localSystem="false"/>
+  <options customize="never" require-scripts="true" rootVolumeOnly="false"/>
+  <welcome file="welcome.html"/>
+  <conclusion file="conclusion.html"/>
+  <choices-outline>
+    <line choice="default">
+      <line choice="com.pneunited.lcai"/>
+    </line>
+  </choices-outline>
+  <choice id="default"/>
+  <choice id="com.pneunited.lcai" visible="false">
+    <pkg-ref id="com.pneunited.lcai"/>
+  </choice>
+  <pkg-ref id="com.pneunited.lcai" version="0" onConclusion="none">component.pkg</pkg-ref>
+</installer-gui-script>

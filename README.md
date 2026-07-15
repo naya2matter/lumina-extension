@@ -15,18 +15,35 @@ When you click **Connect Gemini Automatically**, the extension:
 
 Cookies are held in memory only and forwarded directly — the extension never stores them.
 
-## Setup
+## Distribution & auto-update (for end users)
+
+This extension is distributed **privately from our own server** — not the Chrome
+Web Store. Normal Windows/Mac users install it with a small no-admin installer
+and a one-time "Load unpacked"; it then updates itself automatically from
+`https://ai.lcportal.cloud/ext/`. See **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)**
+for the full pipeline (identity, releases, installers, hosting).
+
+Quick map:
+- `scripts/gen-key.mjs` — pins the extension ID (`key` in the manifest). Run once.
+- `scripts/release.mjs` (`npm run release`) — builds + zips `dist/` and writes `latest.json`.
+- `updater/` — the Go native-messaging host that performs on-disk updates.
+- `installers/windows`, `installers/mac` — the per-user installers users run.
+
+## Dev setup
 
 ```bash
 npm install
 npm run build
 ```
 
-Then load it in Chrome:
+Then load it in Chrome for local development:
 
 1. Open `chrome://extensions`.
 2. Enable **Developer mode** (top-right).
 3. Click **Load unpacked** and select the `dist/` folder.
+
+Because `public/manifest.json` now contains a `key`, the loaded extension always
+gets the stable ID `glanidmlbocpbpihkbahamdipkkiiacb`.
 
 ## Usage
 
@@ -45,15 +62,24 @@ That's it. You no longer need to open `gemini.google.com` or copy cookies by han
 
 ## Configuration
 
-- **Backend URL** — set in `public/background.js` (`BACKEND_URL`, defaults to
-  `http://127.0.0.1:8000`). Update it and the `host_permissions` in
-  `public/manifest.json` when deploying to production.
+- **Backend URL** — set in `public/background.js` (`DEFAULT_BACKEND_URL`, defaults
+  to `https://backend.ai.lcportal.cloud`). The popup also derives the backend
+  per active chat-tab origin (`backendUrlForOrigin` in `src/App.tsx`). Update
+  these and the `host_permissions`/CSP in `public/manifest.json` when changing
+  backends.
 - **Chat origins** — the popup looks for the chat tab on the origins listed in
   `CHAT_ORIGINS` (`src/App.tsx`) and `content_scripts` (`public/manifest.json`).
+- **Update URL** — the self-hosted update manifest location is
+  `https://ai.lcportal.cloud/ext/latest.json` (constant `defaultManifestURL` in
+  `updater/main.go`; override for testing with `LC_UPDATE_MANIFEST_URL`).
 
 ## Project structure
 
-- `public/manifest.json` — MV3 manifest (permissions, host permissions, content script).
-- `public/background.js` — service worker; orchestrates the connect flow and reads cookies.
-- `src/App.tsx` — popup UI (single-click connect + progress + manual fallback).
+- `public/manifest.json` — MV3 manifest (`key`, permissions, host permissions, content script).
+- `public/background.js` — service worker; connect flow, cookie reads, and the update check.
+- `src/App.tsx` — popup UI (single-click connect + progress + manual fallback + version line).
 - `src/content/receiver.ts` — content script; exposes the auth token to the popup.
+- `updater/` — Go native-messaging host that self-updates the unpacked extension.
+- `installers/` — per-user Windows (Inno Setup) and macOS (`.pkg`) installers.
+- `scripts/` — icon/key generation and the release packager.
+- `docs/DEPLOYMENT.md` — full distribution & update guide.

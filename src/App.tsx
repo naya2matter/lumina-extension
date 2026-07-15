@@ -35,6 +35,9 @@ const isChromeExtension =
   typeof chrome.tabs !== 'undefined' &&
   typeof chrome.runtime !== 'undefined'
 
+// Installed version — the updater keeps this current from our server.
+const extVersion = isChromeExtension ? chrome.runtime.getManifest().version : null
+
 // Origins where the PNE LC AI chat app runs (must match manifest content_scripts).
 const CHAT_ORIGINS = ['localhost:5173', 'localhost:3000', '127.0.0.1:3000', 'ai.lcportal.cloud']
 
@@ -85,6 +88,7 @@ function App() {
   const [phase, setPhase] = useState<ConnectPhase | null>(null)
   const [copyLoading, setCopyLoading] = useState(false)
   const [result, setResult] = useState<ResultState>(null)
+  const [updateMsg, setUpdateMsg] = useState<string | null>(null)
 
   useEffect(() => {
     if (!isChromeExtension) {
@@ -164,6 +168,18 @@ function App() {
         setCopyLoading(false)
       },
     )
+  }, [])
+
+  const handleCheckUpdate = useCallback(() => {
+    if (!isChromeExtension) return
+    setUpdateMsg('Checking…')
+    // If an update is found, the service worker reloads the extension and this
+    // popup closes — so a returned callback means we were already up to date.
+    chrome.runtime.sendMessage({ type: 'CHECK_FOR_UPDATE' }, () => {
+      void chrome.runtime.lastError // reloading the ext can drop the channel; ignore
+      setUpdateMsg('Up to date')
+      setTimeout(() => setUpdateMsg(null), 2500)
+    })
   }, [])
 
   const busy = connecting || copyLoading
@@ -260,7 +276,19 @@ function App() {
         </div>
 
         <footer className="popup-footer">
-          Your cookies are sent only to your PNE LC AI instance. They are never stored by this extension.
+          <span>
+            Your cookies are sent only to your PNE LC AI instance. They are never stored by this extension.
+          </span>
+          {extVersion && (
+            <button
+              type="button"
+              className="version-line"
+              onClick={handleCheckUpdate}
+              disabled={busy}
+            >
+              v{extVersion} · {updateMsg ?? 'check for updates'}
+            </button>
+          )}
         </footer>
       </div>
     </div>

@@ -1,0 +1,9 @@
+{
+  "name": "com.pneunited.lc_updater",
+  "description": "PNE LC AI self-hosted updater",
+  "path": "__UPDATER_PATH__",
+  "type": "stdio",
+  "allowed_origins": [
+    "chrome-extension://glanidmlbocpbpihkbahamdipkkiiacb/"
+  ]
+}

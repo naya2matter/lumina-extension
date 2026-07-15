@@ -12,6 +12,13 @@ node_modules
 dist-ssr
 *.local
 
+# Signing / release / installer build artifacts
+keys
+release
+updater/bin
+installers/mac/build
+installers/windows/Output
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

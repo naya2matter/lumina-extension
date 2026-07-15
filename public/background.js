@@ -163,3 +163,86 @@ async function runConnectFlow(token, backendUrl, report) {
     chrome.tabs.onRemoved.removeListener(onRemoved);
   }
 }
+
+// --- Self-hosted auto-update ----------------------------------------------
+// This extension is loaded UNPACKED (no Chrome Web Store), so Chrome never
+// checks for updates on its own. An unpacked extension also cannot rewrite its
+// own source files, so a small per-user native helper (installed alongside the
+// extension) does the download + on-disk swap; we then reload() to load the new
+// files. `chrome.runtime.reload()` reloads an unpacked extension from disk and
+// re-fires onInstalled with reason "update" — that is the mechanism here.
+//
+// If the helper isn't installed (e.g. someone loaded the folder by hand), the
+// connectNative call just disconnects with an error and the extension keeps
+// working — update checks silently no-op.
+
+const UPDATER_HOST = 'com.pneunited.lc_updater';
+const UPDATE_ALARM = 'lc-update-check';
+const UPDATE_PERIOD_MIN = 360; // every 6 hours
+
+function checkForUpdate() {
+  let settled = false;
+  let port;
+
+  const finish = (andThen) => {
+    if (settled) return;
+    settled = true;
+    try {
+      port?.disconnect();
+    } catch {
+      /* already disconnected */
+    }
+    andThen?.();
+  };
+
+  try {
+    port = chrome.runtime.connectNative(UPDATER_HOST);
+  } catch (err) {
+    console.debug('[updater] native host unavailable:', err?.message ?? err);
+    return;
+  }
+
+  port.onMessage.addListener((msg) => {
+    if (msg?.status === 'updated') {
+      console.info(`[updater] updated to ${msg.version} — reloading extension.`);
+      finish(() => chrome.runtime.reload());
+    } else {
+      if (msg?.status === 'error') console.warn('[updater]', msg.message);
+      finish(); // 'current' or unknown — nothing to do
+    }
+  });
+
+  port.onDisconnect.addListener(() => {
+    // Fires (with lastError set) when the host isn't registered — expected, benign.
+    if (chrome.runtime.lastError) {
+      console.debug('[updater] host disconnected:', chrome.runtime.lastError.message);
+    }
+    finish();
+  });
+
+  try {
+    port.postMessage({ cmd: 'check', currentVersion: chrome.runtime.getManifest().version });
+  } catch (err) {
+    console.debug('[updater] could not reach host:', err?.message ?? err);
+    finish();
+  }
+}
+
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.alarms.create(UPDATE_ALARM, { periodInMinutes: UPDATE_PERIOD_MIN });
+  checkForUpdate();
+});
+
+chrome.runtime.onStartup.addListener(checkForUpdate);
+
+chrome.alarms.onAlarm.addListener((alarm) => {
+  if (alarm.name === UPDATE_ALARM) checkForUpdate();
+});
+
+// Let the popup trigger a manual "Check for updates".
+chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  if (message?.type !== 'CHECK_FOR_UPDATE') return;
+  checkForUpdate();
+  sendResponse({ ok: true });
+  return false;
+});
